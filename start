@@ -1,0 +1,19 @@
+#!/bin/bash
+trap "echo -ne '\nstopping container...' && docker stop refinery-authorizer > /dev/null 2>&1 && echo -ne '\t\t [done]\n'" EXIT
+
+echo -ne 'stopping old container...'
+docker stop refinery-authorizer > /dev/null 2>&1
+echo -ne '\t [done]\n'
+
+echo -ne 'building container...'
+docker build -t refinery-authorizer-dev -f Dockerfile . > /dev/null 2>&1
+echo -ne '\t\t [done]\n'
+
+echo -ne 'starting...'
+docker run -d --rm \
+--name refinery-authorizer \
+--network dev-setup_default \
+refinery-authorizer-dev > /dev/null 2>&1
+echo -ne '\t\t\t [done]\n'
+
+docker logs -f refinery-authorizer
