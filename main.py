@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Response, status
+from fastapi import FastAPI, Response, status, responses
 
 app = FastAPI()
 
@@ -28,3 +28,9 @@ def resolve_kratos_admin(body, response):
 
     response.status_code = status.HTTP_403_FORBIDDEN
     return {"status": "not authorized"}
+
+
+@app.get("/healthcheck")
+def healthcheck() -> responses.PlainTextResponse:
+    headers = {"APP": "OK"}
+    return responses.PlainTextResponse("OK", headers=headers)
