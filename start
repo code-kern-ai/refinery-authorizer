@@ -6,7 +6,7 @@ docker stop refinery-authorizer > /dev/null 2>&1
 echo -ne '\t [done]\n'
 
 echo -ne 'building container...'
-docker build -t refinery-authorizer-dev -f Dockerfile . > /dev/null 2>&1
+docker build -t refinery-authorizer-dev -f dev.Dockerfile . > /dev/null 2>&1
 echo -ne '\t\t [done]\n'
 
 echo -ne 'starting...'
