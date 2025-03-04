@@ -1,4 +1,20 @@
 #!/bin/bash
+
+DEBUG_MODE=false
+DEBUG_PORT=15672
+
+while getopts d flag
+do
+    case "${flag}" in
+        d) DEBUG_MODE=true;;
+    esac
+done
+
+CMD=""
+if [ $DEBUG_MODE = true ]; then
+    CMD="debugpy --wait-for-client --listen 0.0.0.0:$DEBUG_PORT -m uvicorn main:app --host 0.0.0.0 --port 80 --reload"
+fi
+
 trap "echo -ne '\nstopping container...' && docker stop refinery-authorizer > /dev/null 2>&1 && echo -ne '\t\t [done]\n'" EXIT
 
 echo -ne 'stopping old container...'
@@ -6,14 +22,18 @@ docker stop refinery-authorizer > /dev/null 2>&1
 echo -ne '\t [done]\n'
 
 echo -ne 'building container...'
-docker build -t refinery-authorizer-dev -f dev.Dockerfile . > /dev/null 2>&1
+docker build -t refinery-authorizer-dev -f dev.Dockerfile .
 echo -ne '\t\t [done]\n'
 
 echo -ne 'starting...'
 docker run -d --rm \
 --name refinery-authorizer \
+-p $DEBUG_PORT:$DEBUG_PORT \
 --network dev-setup_default \
-refinery-authorizer-dev > /dev/null 2>&1
+refinery-authorizer-dev $CMD > /dev/null 2>&1
 echo -ne '\t\t\t [done]\n'
 
+if [ $DEBUG_MODE = true ]; then
+    echo -e "\033[0;33muse VSCode Debugger (Python Debugger: refinery-authorizer) to start the service\033[0m"
+fi
 docker logs -f refinery-authorizer
