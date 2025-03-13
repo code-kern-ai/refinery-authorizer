@@ -8,19 +8,19 @@ annotated-types==0.7.0
     # via
     #   -r requirements/mini-requirements.txt
     #   pydantic
-anyio==4.6.2.post1
+anyio==4.8.0
     # via
     #   -r requirements/mini-requirements.txt
     #   starlette
-certifi==2024.8.30
+certifi==2025.1.31
     # via
     #   -r requirements/mini-requirements.txt
     #   requests
-charset-normalizer==3.4.0
+charset-normalizer==3.4.1
     # via
     #   -r requirements/mini-requirements.txt
     #   requests
-click==8.1.7
+click==8.1.8
     # via
     #   -r requirements/mini-requirements.txt
     #   uvicorn
@@ -66,7 +66,7 @@ typing-extensions==4.12.2
     #   pydantic
     #   pydantic-core
     #   starlette
-urllib3==2.2.3
+urllib3==2.3.0
     # via
     #   -r requirements/mini-requirements.txt
     #   requests
