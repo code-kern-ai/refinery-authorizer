@@ -6,61 +6,61 @@
 #
 annotated-types==0.7.0
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   pydantic
 anyio==4.9.0
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   starlette
 certifi==2025.6.15
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   requests
 charset-normalizer==3.4.2
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   requests
 click==8.1.8
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   uvicorn
 exceptiongroup==1.3.0
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   anyio
 fastapi==0.115.2
-    # via -r requirements/mini-requirements.txt
+    # via -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
 h11==0.16.0
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   uvicorn
 idna==3.10
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   anyio
     #   requests
 pydantic==2.7.4
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   -r requirements/requirements.in
     #   fastapi
 pydantic-core==2.18.4
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   pydantic
 requests==2.31.0
-    # via -r requirements/mini-requirements.txt
+    # via -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
 sniffio==1.3.1
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   anyio
 starlette==0.40.0
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   fastapi
 typing-extensions==4.14.0
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   anyio
     #   exceptiongroup
     #   fastapi
@@ -70,7 +70,7 @@ typing-extensions==4.14.0
     #   uvicorn
 urllib3==2.5.0
     # via
-    #   -r requirements/mini-requirements.txt
+    #   -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
     #   requests
 uvicorn==0.35.0
-    # via -r requirements/mini-requirements.txt
+    # via -r /home/runner/work/refinery-mini-parent-image/refinery-mini-parent-image/refinery-authorizer/requirements/mini-requirements.txt
