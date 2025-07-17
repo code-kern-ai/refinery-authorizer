@@ -1,4 +1,4 @@
-FROM kernai/refinery-parent-images:python-upgrade-mini
+FROM kernai/refinery-parent-images:python-upgrade-upgrade-mini
 
 WORKDIR /app
 
