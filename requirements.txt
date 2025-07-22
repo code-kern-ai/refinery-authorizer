@@ -12,7 +12,7 @@ anyio==4.9.0
     # via
     #   -r /home/runner/work/refinery-submodule-parent-images/refinery-submodule-parent-images/refinery-authorizer/requirements/mini-requirements.txt
     #   starlette
-certifi==2025.6.15
+certifi==2025.7.14
     # via
     #   -r /home/runner/work/refinery-submodule-parent-images/refinery-submodule-parent-images/refinery-authorizer/requirements/mini-requirements.txt
     #   requests
@@ -20,11 +20,11 @@ charset-normalizer==3.4.2
     # via
     #   -r /home/runner/work/refinery-submodule-parent-images/refinery-submodule-parent-images/refinery-authorizer/requirements/mini-requirements.txt
     #   requests
-click==8.1.8
+click==8.2.1
     # via
     #   -r /home/runner/work/refinery-submodule-parent-images/refinery-submodule-parent-images/refinery-authorizer/requirements/mini-requirements.txt
     #   uvicorn
-fastapi==0.115.2
+fastapi==0.116.1
     # via -r /home/runner/work/refinery-submodule-parent-images/refinery-submodule-parent-images/refinery-authorizer/requirements/mini-requirements.txt
 h11==0.16.0
     # via
@@ -50,17 +50,18 @@ sniffio==1.3.1
     # via
     #   -r /home/runner/work/refinery-submodule-parent-images/refinery-submodule-parent-images/refinery-authorizer/requirements/mini-requirements.txt
     #   anyio
-starlette==0.40.0
+starlette==0.47.2
     # via
     #   -r /home/runner/work/refinery-submodule-parent-images/refinery-submodule-parent-images/refinery-authorizer/requirements/mini-requirements.txt
     #   fastapi
-typing-extensions==4.14.0
+typing-extensions==4.14.1
     # via
     #   -r /home/runner/work/refinery-submodule-parent-images/refinery-submodule-parent-images/refinery-authorizer/requirements/mini-requirements.txt
     #   anyio
     #   fastapi
     #   pydantic
     #   pydantic-core
+    #   starlette
 urllib3==2.5.0
     # via
     #   -r /home/runner/work/refinery-submodule-parent-images/refinery-submodule-parent-images/refinery-authorizer/requirements/mini-requirements.txt
