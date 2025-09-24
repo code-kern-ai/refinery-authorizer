@@ -1,2 +1,6 @@
 -r mini-requirements.txt
 pydantic==2.7.4
+opentelemetry-exporter-otlp-proto-grpc==1.37.0
+opentelemetry-instrumentation-fastapi==0.58b0
+opentelemetry-instrumentation-logging==0.58b0
+prometheus-client==0.23.1
