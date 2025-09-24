@@ -2,11 +2,13 @@
 
 DEBUG_MODE=false
 DEBUG_PORT=15672
+ENABLE_TELEMETRY=false
 
-while getopts d flag
+while getopts dg flag
 do
     case "${flag}" in
         d) DEBUG_MODE=true;;
+        g) ENABLE_TELEMETRY=true;;
     esac
 done
 
@@ -29,6 +31,7 @@ echo -ne 'starting...'
 docker run -d --rm \
 --name refinery-authorizer \
 -p $DEBUG_PORT:$DEBUG_PORT \
+-e ENABLE_TELEMETRY=$ENABLE_TELEMETRY \
 --network dev-setup_default \
 refinery-authorizer-dev $CMD > /dev/null 2>&1
 echo -ne '\t\t\t [done]\n'
