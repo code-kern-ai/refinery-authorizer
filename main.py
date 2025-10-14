@@ -1,6 +1,24 @@
 from fastapi import FastAPI, Response, status, responses
+import os
+import logging
+import telemetry
 
-app = FastAPI()
+
+OTLP_GRPC_ENDPOINT = os.getenv("OTLP_GRPC_ENDPOINT", "tempo:4317")
+
+app_name = "refinery-authorizer"
+app = FastAPI(title=app_name)
+
+if telemetry.ENABLE_TELEMETRY:
+    print("WARNING:  Running telemetry.", flush=True)
+    telemetry.setting_otlp(app, app_name=app_name, endpoint=OTLP_GRPC_ENDPOINT)
+    app.add_middleware(telemetry.PrometheusMiddleware, app_name=app_name)
+    app.add_route("/metrics", telemetry.metrics)
+
+    # Filter out /metrics
+    logging.getLogger("uvicorn.access").addFilter(
+        lambda record: "GET /metrics" not in record.getMessage()
+    )
 
 
 @app.get("/health")
