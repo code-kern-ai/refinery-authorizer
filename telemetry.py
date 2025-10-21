@@ -22,6 +22,8 @@ from starlette.routing import Match
 from starlette.status import HTTP_500_INTERNAL_SERVER_ERROR
 from starlette.types import ASGIApp
 
+
+APP_NAME = os.getenv("APP_NAME")
 ENABLE_TELEMETRY = os.getenv("ENABLE_TELEMETRY", "false") == "true"
 
 INFO = Gauge("fastapi_app_info", "FastAPI application information.", ["app_name"])
@@ -49,6 +51,41 @@ REQUESTS_IN_PROGRESS = Gauge(
     "fastapi_requests_in_progress",
     "Gauge of requests by method and path currently being processed",
     ["method", "path", "app_name"],
+)
+TASKS_IN_PROGRESS = Gauge(
+    "cognition_tasks_in_progress",
+    "Indicates if the task master thread is running (1) or not (0)",
+    ["task_name", "app_name"],
+)
+TASKS_PROCESSED = Counter(
+    "cognition_task_processed_total",
+    "Total items processed by the task",
+    ["task_name", "app_name"],
+)
+TASKS_ERRORS = Counter(
+    "cognition_task_errors_total",
+    "Total errors encountered by the task",
+    ["task_name", "app_name"],
+)
+WEBSOCKET_EXTERNAL_SUCCESS = Counter(
+    "cognition_websocket_external_success_total",
+    "Total successful external websocket connections",
+    ["app_name", "org_id", "project_id"],
+)
+WEBSOCKET_EXTERNAL_FAILURE = Counter(
+    "cognition_websocket_external_failure_total",
+    "Total failed external websocket connections",
+    ["app_name", "org_id", "project_id"],
+)
+WEBSOCKET_INTERNAL_SUCCESS = Counter(
+    "cognition_websocket_internal_success_total",
+    "Total successful internal websocket connections",
+    ["app_name", "org_id", "project_id"],
+)
+WEBSOCKET_INTERNAL_FAILURE = Counter(
+    "cognition_websocket_internal_failure_total",
+    "Total failed internal websocket connections",
+    ["app_name", "org_id", "project_id"],
 )
 
 
@@ -122,12 +159,20 @@ def metrics(request: Request) -> Response:
     )
 
 
+def setting_app_name(app_name: str) -> None:
+    global APP_NAME
+    if APP_NAME is None:
+        APP_NAME = app_name
+
+
 def setting_otlp(
     app: ASGIApp, app_name: str, endpoint: str, log_correlation: bool = True
 ) -> None:
     # Setting OpenTelemetry
     # set the service name to show in traces
-    resource = Resource.create(attributes={"service.name": app_name})
+    resource = Resource.create(
+        attributes={"service.name": app_name, "compose_service": app_name}
+    )
 
     # set the tracer provider
     tracer = TracerProvider(resource=resource)
