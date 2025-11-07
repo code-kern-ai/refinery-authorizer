@@ -44,6 +44,12 @@ def resolve_kratos_admin(body, response):
     ):
         response.status_code = status.HTTP_200_OK
         return {"status": "authorized"}
+    elif (
+        subject.get("metadata_public", {}).get("role") == "ADMIN"
+        and subject["verifiable_addresses"][0]["verified"]
+    ):
+        response.status_code = status.HTTP_200_OK
+        return {"status": "authorized"}
 
     response.status_code = status.HTTP_403_FORBIDDEN
     return {"status": "not authorized"}
