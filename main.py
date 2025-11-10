@@ -45,7 +45,8 @@ def resolve_kratos_admin(body, response):
         response.status_code = status.HTTP_200_OK
         return {"status": "authorized"}
     elif (
-        subject.get("metadata_public", {}).get("role") == "ADMIN"
+        # subject metadata_public can be None so we use or {} instead of get with default
+        (subject.get("metadata_public") or {}).get("role") == "ADMIN"
         and subject["verifiable_addresses"][0]["verified"]
     ):
         response.status_code = status.HTTP_200_OK
