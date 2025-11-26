@@ -4,29 +4,33 @@
 #
 #    pip-compile --output-file=requirements.txt requirements/requirements.in
 #
+annotated-doc==0.0.4
+    # via
+    #   -r requirements/mini-requirements.txt
+    #   fastapi
 annotated-types==0.7.0
     # via
     #   -r requirements/mini-requirements.txt
     #   pydantic
-anyio==4.9.0
+anyio==4.11.0
     # via
     #   -r requirements/mini-requirements.txt
     #   starlette
 asgiref==3.11.0
     # via opentelemetry-instrumentation-asgi
-certifi==2025.7.14
+certifi==2025.11.12
     # via
     #   -r requirements/mini-requirements.txt
     #   requests
-charset-normalizer==3.4.2
+charset-normalizer==3.4.4
     # via
     #   -r requirements/mini-requirements.txt
     #   requests
-click==8.2.1
+click==8.3.1
     # via
     #   -r requirements/mini-requirements.txt
     #   uvicorn
-fastapi==0.116.1
+fastapi==0.120.1
     # via -r requirements/mini-requirements.txt
 googleapis-common-protos==1.72.0
     # via opentelemetry-exporter-otlp-proto-grpc
@@ -36,7 +40,7 @@ h11==0.16.0
     # via
     #   -r requirements/mini-requirements.txt
     #   uvicorn
-idna==3.10
+idna==3.11
     # via
     #   -r requirements/mini-requirements.txt
     #   anyio
@@ -106,11 +110,11 @@ sniffio==1.3.1
     # via
     #   -r requirements/mini-requirements.txt
     #   anyio
-starlette==0.47.2
+starlette==0.49.3
     # via
     #   -r requirements/mini-requirements.txt
     #   fastapi
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   -r requirements/mini-requirements.txt
     #   anyio
