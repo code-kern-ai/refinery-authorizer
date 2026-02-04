@@ -1,0 +1,121 @@
+---
+description: Rules for authorization logic and access control patterns
+globs: ["main.py"]
+alwaysApply: true
+---
+
+# Authorization Guidelines
+
+Authorization logic evaluates whether users have access to specific resources based on identity, roles, and configured policies.
+
+## Authorization Pattern
+
+**Basic structure:**
+```python
+@app.post("/authorize")
+def authorize(body: dict, response: Response):
+    if body["resource"] == "kratos:admin":
+        return resolve_kratos_admin(body, response)
+    
+    response.status_code = status.HTTP_403_FORBIDDEN
+    return {"status": "not authorized"}
+```
+
+## Resource-Based Routing
+
+Route authorization decisions by resource type:
+
+```python
+def authorize(body: dict, response: Response):
+    resource = body.get("resource")
+    
+    if resource == "kratos:admin":
+        return resolve_kratos_admin(body, response)
+    elif resource == "other:resource":
+        return resolve_other_resource(body, response)
+    
+    # Default: deny access
+    response.status_code = status.HTTP_403_FORBIDDEN
+    return {"status": "not authorized"}
+```
+
+## Authorization Decision Functions
+
+**Structure:**
+```python
+def resolve_kratos_admin(body: dict, response: Response) -> dict:
+    subject = body["subject"]["identity"]
+    
+    # Check authorization conditions
+    if is_authorized(subject):
+        response.status_code = status.HTTP_200_OK
+        return {"status": "authorized"}
+    
+    response.status_code = status.HTTP_403_FORBIDDEN
+    return {"status": "not authorized"}
+```
+
+## Authorization Checks
+
+**Role-based check:**
+```python
+# Handle None metadata_public safely
+metadata = subject.get("metadata_public") or {}
+if metadata.get("role") == "ADMIN":
+    # Authorized
+```
+
+**Verification check:**
+```python
+if subject["verifiable_addresses"][0]["verified"]:
+    # Email verified
+```
+
+## Safe Data Access
+
+**Handle optional fields:**
+```python
+# Use .get() with defaults for optional fields
+metadata = subject.get("metadata_public") or {}
+
+# Use .get() with default for nested access
+role = (subject.get("metadata_public") or {}).get("role")
+```
+
+**Validate required fields exist:**
+```python
+if "subject" not in body or "identity" not in body["subject"]:
+    response.status_code = status.HTTP_400_BAD_REQUEST
+    return {"status": "invalid request"}
+```
+
+## Response Patterns
+
+**Authorized:**
+```python
+response.status_code = status.HTTP_200_OK
+return {"status": "authorized"}
+```
+
+**Forbidden:**
+```python
+response.status_code = status.HTTP_403_FORBIDDEN
+return {"status": "not authorized"}
+```
+
+**Invalid Request:**
+```python
+response.status_code = status.HTTP_400_BAD_REQUEST
+return {"status": "invalid request", "error": "missing required field"}
+```
+
+## Best Practices
+
+1. Always check all authorization conditions before granting access
+2. Use safe access patterns (`.get()` with defaults) for optional fields
+3. Validate required fields exist before accessing nested data
+4. Return consistent response format: `{"status": "authorized"}` or `{"status": "not authorized"}`
+5. Set appropriate HTTP status codes (200, 403, 400)
+6. Keep authorization logic focused and testable
+7. Document authorization policies clearly in code comments
+8. Handle edge cases (None values, missing fields, empty arrays)

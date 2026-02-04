@@ -1,0 +1,151 @@
+---
+description: Rules for observability, telemetry, and monitoring
+globs: ["telemetry.py", "main.py"]
+alwaysApply: true
+---
+
+# Telemetry Guidelines
+
+Telemetry provides observability through OpenTelemetry tracing and Prometheus metrics.
+
+## Configuration
+
+**Environment variables:**
+```python
+import os
+
+OTLP_GRPC_ENDPOINT = os.getenv("OTLP_GRPC_ENDPOINT", "tempo:4317")
+ENABLE_TELEMETRY = os.getenv("ENABLE_TELEMETRY", "false") == "true"
+```
+
+**Conditional setup:**
+```python
+if telemetry.ENABLE_TELEMETRY:
+    print("WARNING:  Running telemetry.", flush=True)
+    telemetry.setting_app_name(app_name)
+    telemetry.setting_otlp(app, app_name=app_name, endpoint=OTLP_GRPC_ENDPOINT)
+    app.add_middleware(telemetry.PrometheusMiddleware, app_name=app_name)
+    app.add_route("/metrics", telemetry.metrics)
+```
+
+## OpenTelemetry Setup
+
+**Configure OTLP exporter:**
+```python
+from opentelemetry import trace
+from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.sdk.resources import Resource
+from opentelemetry.sdk.trace import TracerProvider
+from opentelemetry.sdk.trace.export import BatchSpanProcessor
+
+def setting_otlp(app: ASGIApp, app_name: str, endpoint: str):
+    resource = Resource.create(
+        attributes={"service.name": app_name, "compose_service": app_name}
+    )
+    
+    tracer = TracerProvider(resource=resource)
+    trace.set_tracer_provider(tracer)
+    
+    tracer.add_span_processor(
+        BatchSpanProcessor(OTLPSpanExporter(endpoint=endpoint, insecure=True))
+    )
+    
+    FastAPIInstrumentor.instrument_app(app, tracer_provider=tracer)
+```
+
+## Prometheus Metrics
+
+**Define metrics:**
+```python
+from prometheus_client import Counter, Gauge, Histogram
+
+REQUESTS = Counter(
+    "fastapi_requests_total",
+    "Total count of requests by method and path.",
+    ["method", "path", "app_name"],
+)
+
+RESPONSES = Counter(
+    "fastapi_responses_total",
+    "Total count of responses by method, path and status codes.",
+    ["method", "path", "status_code", "app_name"],
+)
+
+REQUESTS_PROCESSING_TIME = Histogram(
+    "fastapi_requests_duration_seconds",
+    "Histogram of requests processing time by path (in seconds)",
+    ["method", "path", "app_name"],
+)
+```
+
+## Prometheus Middleware
+
+**Track requests:**
+```python
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
+from starlette.responses import Response
+
+class PrometheusMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        method = request.method
+        path, is_handled_path = self.get_path(request)
+        
+        if not is_handled_path:
+            return await call_next(request)
+        
+        REQUESTS.labels(method=method, path=path, app_name=self.app_name).inc()
+        before_time = time.perf_counter()
+        
+        try:
+            response = await call_next(request)
+        except BaseException as e:
+            EXCEPTIONS.labels(...).inc()
+            raise
+        else:
+            status_code = response.status_code
+            after_time = time.perf_counter()
+            REQUESTS_PROCESSING_TIME.labels(...).observe(after_time - before_time)
+        
+        RESPONSES.labels(...).inc()
+        return response
+```
+
+## Metrics Endpoint
+
+**Expose Prometheus metrics:**
+```python
+from prometheus_client.openmetrics.exposition import generate_latest, CONTENT_TYPE_LATEST
+from starlette.responses import Response
+
+def metrics(request: Request) -> Response:
+    return Response(
+        generate_latest(REGISTRY),
+        headers={"Content-Type": CONTENT_TYPE_LATEST}
+    )
+
+# Register route
+app.add_route("/metrics", telemetry.metrics)
+```
+
+## Log Filtering
+
+**Filter out metrics endpoint from access logs:**
+```python
+import logging
+
+logging.getLogger("uvicorn.access").addFilter(
+    lambda record: "GET /metrics" not in record.getMessage()
+)
+```
+
+## Best Practices
+
+1. Make telemetry opt-in via environment variable
+2. Use consistent app_name across all metrics
+3. Include method, path, and app_name labels in metrics
+4. Track request duration, counts, and status codes
+5. Filter out health check and metrics endpoints from logs
+6. Use BatchSpanProcessor for efficient trace export
+7. Set appropriate resource attributes for service identification
+8. Handle telemetry failures gracefully (don't break the app)

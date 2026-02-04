@@ -1,0 +1,127 @@
+---
+description: Rules for testing patterns and test structure
+globs: ["tests/**/*.py", "conftest.py"]
+alwaysApply: true
+---
+
+# Testing Guidelines
+
+Tests ensure authorization logic works correctly for all scenarios.
+
+## Test Structure
+
+**Use pytest with FastAPI TestClient:**
+```python
+import pytest
+from fastapi.testclient import TestClient
+from typing import Iterator
+from main import app
+
+@pytest.fixture
+def client() -> Iterator[TestClient]:
+    with TestClient(app) as client:
+        yield client
+```
+
+## Test Patterns
+
+**Health check tests:**
+```python
+def test_healthcheck(client: TestClient):
+    response = client.get("/healthcheck")
+    assert response.status_code == 200
+    assert response.text == "OK"
+```
+
+**Health endpoint tests:**
+```python
+def test_health(client: TestClient):
+    response = client.get("/health")
+    assert response.status_code == 200
+    assert response.json() == {"alive": "true"}
+```
+
+## Authorization Tests
+
+**Test authorized scenarios:**
+```python
+def test_authorize_kratos_admin_authorized(client: TestClient):
+    body = {
+        "resource": "kratos:admin",
+        "subject": {
+            "identity": {
+                "traits": {"email": "user@kern.ai"},
+                "verifiable_addresses": [{"verified": True}]
+            }
+        }
+    }
+    response = client.post("/authorize", json=body)
+    assert response.status_code == 200
+    assert response.json() == {"status": "authorized"}
+```
+
+**Test unauthorized scenarios:**
+```python
+def test_authorize_kratos_admin_unauthorized(client: TestClient):
+    body = {
+        "resource": "kratos:admin",
+        "subject": {
+            "identity": {
+                "traits": {"email": "user@example.com"},
+                "verifiable_addresses": [{"verified": True}]
+            }
+        }
+    }
+    response = client.post("/authorize", json=body)
+    assert response.status_code == 403
+    assert response.json() == {"status": "not authorized"}
+```
+
+**Test invalid requests:**
+```python
+def test_authorize_missing_resource(client: TestClient):
+    body = {
+        "subject": {
+            "identity": {
+                "traits": {"email": "user@kern.ai"},
+                "verifiable_addresses": [{"verified": True}]
+            }
+        }
+    }
+    response = client.post("/authorize", json=body)
+    assert response.status_code == 400
+```
+
+## Test Coverage
+
+**Test all authorization paths:**
+- Authorized scenarios (email domain match, role match)
+- Unauthorized scenarios (wrong domain, no role, unverified email)
+- Invalid requests (missing fields, wrong structure)
+- Edge cases (None values, empty arrays, missing nested fields)
+
+## Test Organization
+
+**Group related tests:**
+```python
+class TestKratosAdminAuthorization:
+    def test_email_domain_match(self, client: TestClient):
+        pass
+    
+    def test_role_match(self, client: TestClient):
+        pass
+    
+    def test_unverified_email(self, client: TestClient):
+        pass
+```
+
+## Best Practices
+
+1. Test both success and failure paths
+2. Test edge cases (None, empty arrays, missing fields)
+3. Use descriptive test names that explain what is being tested
+4. Keep tests focused - one assertion per test concept
+5. Use fixtures for common test data
+6. Test authorization logic thoroughly - security is critical
+7. Test error handling and invalid inputs
+8. Use TestClient for integration-style tests
