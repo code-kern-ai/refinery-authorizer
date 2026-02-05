@@ -91,7 +91,7 @@ packaging==25.0
     # via opentelemetry-instrumentation
 prometheus-client==0.23.1
     # via -r requirements/requirements.in
-protobuf==6.33.1
+protobuf==6.33.5
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
