@@ -1,0 +1,61 @@
+---
+description: Main guidelines and architecture overview for refinery-authorizer
+alwaysApply: true
+---
+
+# Refinery Authorizer Guidelines
+
+Authorization service guidelines ensuring consistency across API routes, authorization logic, telemetry, and testing.
+
+## Overview
+
+The `refinery-authorizer` is a FastAPI-based microservice that evaluates whether a user has access to certain resources. It serves as an authorization decision point, primarily for Kratos admin access, within the Refinery platform ecosystem.
+
+## Architecture
+
+The authorizer follows a simple, focused architecture:
+
+- **FastAPI Routes** (`main.py`): HTTP endpoint definitions for authorization decisions and health checks
+- **Authorization Logic** (`main.py`): Business logic for evaluating access permissions
+- **Telemetry** (`telemetry.py`): OpenTelemetry instrumentation and Prometheus metrics
+- **Tests** (`tests/`): Test suite using pytest and FastAPI TestClient
+
+## Guideline Files
+
+- **[authorization.mdc](./authorization.mdc)** - Rules for authorization logic and decision patterns
+- **[fastapi-routes.mdc](./fastapi-routes.mdc)** - Rules for FastAPI route definitions
+- **[telemetry.mdc](./telemetry.mdc)** - Rules for observability and telemetry
+- **[exceptions.mdc](./exceptions.mdc)** - Rules for exception handling
+- **[testing.mdc](./testing.mdc)** - Rules for testing patterns
+
+## General Principles
+
+1. **Simplicity**: Keep the service focused on authorization decisions - avoid unnecessary complexity
+2. **Type Safety**: Use type hints consistently, leverage Pydantic for request validation
+3. **Security First**: Always validate inputs, handle edge cases, return appropriate HTTP status codes
+4. **Observability**: Ensure all requests are instrumented for tracing and metrics
+5. **Testability**: Write clear, focused tests for authorization logic
+6. **Stateless**: Authorization decisions should be stateless and idempotent
+
+## Directory Structure
+
+```
+refinery-authorizer/
+├── main.py              # FastAPI application and authorization routes
+├── telemetry.py         # OpenTelemetry and Prometheus instrumentation
+├── conftest.py          # Pytest configuration and fixtures
+├── tests/               # Test suite
+│   └── test_main.py     # Route and authorization logic tests
+├── requirements/        # Python dependencies
+└── .cursor/rules/       # Cursor AI rules
+```
+
+## Quick Reference
+
+**Authorization**: Evaluate access based on resource type, user identity, and configured policies. Return HTTP 200 for authorized, 403 for forbidden.
+
+**Telemetry**: Enabled via `ENABLE_TELEMETRY` environment variable. Exports traces to OTLP endpoint and exposes Prometheus metrics at `/metrics`.
+
+**Health Checks**: `/health` returns JSON status, `/healthcheck` returns plain text "OK" for load balancer checks.
+
+**Testing**: Use `pytest` with FastAPI `TestClient` fixture. Test both authorized and unauthorized scenarios.

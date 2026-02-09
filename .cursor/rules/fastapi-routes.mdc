@@ -1,0 +1,147 @@
+---
+description: Rules for FastAPI route definitions and HTTP handling
+globs: ["main.py"]
+alwaysApply: true
+---
+
+# FastAPI Routes Guidelines
+
+Routes handle HTTP request/response logic. Keep routes simple and focused on authorization decisions.
+
+## Route Structure
+
+**Basic route:**
+```python
+from fastapi import FastAPI, Response, status
+
+app = FastAPI(title="refinery-authorizer")
+
+@app.post("/authorize")
+def authorize(body: dict, response: Response):
+    # Authorization logic
+    pass
+```
+
+## Health Check Routes
+
+**JSON health endpoint:**
+```python
+@app.get("/health")
+async def root():
+    return {"alive": "true"}
+```
+
+**Plain text healthcheck (for load balancers):**
+```python
+from fastapi import responses
+
+@app.get("/healthcheck")
+def healthcheck() -> responses.PlainTextResponse:
+    return responses.PlainTextResponse("OK")
+```
+
+## Request Body Handling
+
+**Accept dict for flexible authorization requests:**
+```python
+@app.post("/authorize")
+def authorize(body: dict, response: Response):
+    resource = body.get("resource")
+    subject = body.get("subject", {})
+    # Process authorization
+```
+
+**For type safety, consider Pydantic models:**
+```python
+from pydantic import BaseModel
+from typing import Optional, Dict, Any
+
+class AuthorizeRequest(BaseModel):
+    resource: str
+    subject: Dict[str, Any]
+
+@app.post("/authorize")
+def authorize(body: AuthorizeRequest, response: Response):
+    if body.resource == "kratos:admin":
+        return resolve_kratos_admin(body.dict(), response)
+```
+
+## Response Handling
+
+**Set status codes explicitly:**
+```python
+from fastapi import Response, status
+
+response.status_code = status.HTTP_200_OK
+return {"status": "authorized"}
+
+response.status_code = status.HTTP_403_FORBIDDEN
+return {"status": "not authorized"}
+```
+
+**Use FastAPI status constants:**
+```python
+status.HTTP_200_OK      # Success
+status.HTTP_400_BAD_REQUEST  # Invalid request
+status.HTTP_403_FORBIDDEN    # Forbidden
+status.HTTP_500_INTERNAL_SERVER_ERROR  # Server error
+```
+
+## Error Handling
+
+**Handle missing fields:**
+```python
+@app.post("/authorize")
+def authorize(body: dict, response: Response):
+    if "resource" not in body:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"status": "error", "message": "resource is required"}
+    
+    # Continue processing
+```
+
+**Handle exceptions:**
+```python
+from fastapi import HTTPException
+
+@app.post("/authorize")
+def authorize(body: dict, response: Response):
+    try:
+        # Authorization logic
+        pass
+    except KeyError as e:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"status": "error", "message": f"Missing field: {e}"}
+    except Exception as e:
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"status": "error", "message": "Internal server error"}
+```
+
+## Async vs Sync
+
+**Use async for I/O operations:**
+```python
+@app.get("/health")
+async def root():
+    # If you need async I/O
+    return {"alive": "true"}
+```
+
+**Use sync for simple logic:**
+```python
+@app.post("/authorize")
+def authorize(body: dict, response: Response):
+    # Simple authorization logic doesn't need async
+    pass
+```
+
+## Best Practices
+
+1. Keep routes thin - delegate complex logic to separate functions
+2. Always set appropriate HTTP status codes
+3. Return consistent response formats
+4. Validate request data before processing
+5. Handle errors gracefully with appropriate status codes
+6. Use type hints for all parameters
+7. Document route purpose with clear function names
+8. Use async only when needed (I/O operations)
