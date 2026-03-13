@@ -75,7 +75,7 @@ def get_consent(challenge: str | None = None):
         resp.raise_for_status()
         return responses.JSONResponse(status_code=resp.status_code, content=resp.json())
     except requests.RequestException as e:
-        logging.getLogger(__name__).warning("Hydra consent get failed: %s", e)
+        logging.getLogger(__name__).error("Hydra consent get failed: %s", e)
         return responses.JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             content={"status": "error", "message": "failed to get consent request"},
