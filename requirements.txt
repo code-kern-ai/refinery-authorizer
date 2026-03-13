@@ -18,11 +18,11 @@ anyio==4.12.1
     #   starlette
 asgiref==3.11.1
     # via opentelemetry-instrumentation-asgi
-certifi==2026.1.4
+certifi==2026.2.25
     # via
     #   -r requirements/mini-requirements.txt
     #   requests
-charset-normalizer==3.4.4
+charset-normalizer==3.4.5
     # via
     #   -r requirements/mini-requirements.txt
     #   requests
@@ -32,9 +32,9 @@ click==8.3.1
     #   uvicorn
 fastapi==0.120.1
     # via -r requirements/mini-requirements.txt
-googleapis-common-protos==1.72.0
+googleapis-common-protos==1.73.0
     # via opentelemetry-exporter-otlp-proto-grpc
-grpcio==1.76.0
+grpcio==1.78.0
     # via opentelemetry-exporter-otlp-proto-grpc
 h11==0.16.0
     # via
