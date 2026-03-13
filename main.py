@@ -64,7 +64,7 @@ def get_consent(challenge: str | None = None):
     if not challenge:
         return responses.JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": "missing challenge"},
+            content={"status": "error", "message": "missing challenge"},
         )
     try:
         resp = requests.get(
@@ -78,7 +78,7 @@ def get_consent(challenge: str | None = None):
         logging.getLogger(__name__).warning("Hydra consent get failed: %s", e)
         return responses.JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"error": "failed to get consent request"},
+            content={"status": "error", "message": "failed to get consent request"},
         )
 
 
@@ -88,7 +88,7 @@ def accept_consent(body: dict):
     if not challenge:
         return responses.JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": "missing challenge"},
+            content={"status": "error", "message": "missing challenge"},
         )
     payload = {
         k: body[k]
@@ -110,12 +110,14 @@ def accept_consent(body: dict):
         )
         resp.raise_for_status()
         data = resp.json()
-        return responses.JSONResponse(content={"redirect_to": data.get("redirect_to", "")})
+        return responses.JSONResponse(
+            content={"redirect_to": data.get("redirect_to", "")}
+        )
     except requests.RequestException as e:
         logging.getLogger(__name__).warning("Hydra consent accept failed: %s", e)
         return responses.JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"error": "failed to accept consent request"},
+            content={"status": "error", "message": "failed to accept consent request"},
         )
 
 
@@ -125,7 +127,7 @@ def reject_consent(body: dict):
     if not challenge:
         return responses.JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": "missing challenge"},
+            content={"status": "error", "message": "missing challenge"},
         )
     try:
         resp = requests.put(
@@ -139,12 +141,14 @@ def reject_consent(body: dict):
         )
         resp.raise_for_status()
         data = resp.json()
-        return responses.JSONResponse(content={"redirect_to": data.get("redirect_to", "")})
+        return responses.JSONResponse(
+            content={"redirect_to": data.get("redirect_to", "")}
+        )
     except requests.RequestException as e:
         logging.getLogger(__name__).warning("Hydra consent reject failed: %s", e)
         return responses.JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"error": "failed to reject consent request"},
+            content={"status": "error", "message": "failed to reject consent request"},
         )
 
 
@@ -155,7 +159,7 @@ def accept_login(body: dict):
     if not challenge or not subject:
         return responses.JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"error": "missing challenge or subject"},
+            content={"status": "error", "message": "missing challenge or subject"},
         )
     try:
         resp = requests.put(
@@ -166,12 +170,17 @@ def accept_login(body: dict):
         )
         resp.raise_for_status()
         data = resp.json()
-        return responses.JSONResponse(content={"redirect_to": data.get("redirect_to", "")})
+        return responses.JSONResponse(
+            content={"redirect_to": data.get("redirect_to", "")}
+        )
     except requests.RequestException as e:
         logging.getLogger(__name__).warning("Hydra login accept failed: %s", e)
         return responses.JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"error": "An error occurred while accepting the login challenge"},
+            content={
+                "status": "error",
+                "message": "An error occurred while accepting the login challenge",
+            },
         )
 
 
