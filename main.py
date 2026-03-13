@@ -1,10 +1,12 @@
 from fastapi import FastAPI, Response, status, responses
 import os
 import logging
+import requests
 import telemetry
 
 
 OTLP_GRPC_ENDPOINT = os.getenv("OTLP_GRPC_ENDPOINT", "tempo:4317")
+HYDRA_ADMIN_URL = os.getenv("HYDRA_ADMIN_URL", "http://hydra:4445")
 
 app_name = "refinery-authorizer"
 app = FastAPI(title=app_name)
@@ -54,6 +56,132 @@ def resolve_kratos_admin(body, response):
 
     response.status_code = status.HTTP_403_FORBIDDEN
     return {"status": "not authorized"}
+
+
+# Hydra admin API proxy (for OAuth2 login/consent flows)
+@app.get("/hydra/consent")
+def get_consent(challenge: str | None = None):
+    if not challenge:
+        return responses.JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"status": "error", "message": "missing challenge"},
+        )
+    try:
+        resp = requests.get(
+            f"{HYDRA_ADMIN_URL}/admin/oauth2/auth/requests/consent",
+            params={"consent_challenge": challenge},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        return responses.JSONResponse(status_code=resp.status_code, content=resp.json())
+    except requests.RequestException as e:
+        logging.getLogger(__name__).error("Hydra consent get failed: %s", e)
+        return responses.JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"status": "error", "message": "failed to get consent request"},
+        )
+
+
+@app.post("/hydra/consent/accept")
+def accept_consent(body: dict):
+    challenge = body.get("challenge")
+    if not challenge:
+        return responses.JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"status": "error", "message": "missing challenge"},
+        )
+    payload = {
+        k: body[k]
+        for k in (
+            "grant_scope",
+            "grant_access_token_audience",
+            "remember",
+            "remember_for",
+            "session",
+        )
+        if k in body
+    }
+    try:
+        resp = requests.put(
+            f"{HYDRA_ADMIN_URL}/admin/oauth2/auth/requests/consent/accept",
+            params={"consent_challenge": challenge},
+            json=payload,
+            timeout=10,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return responses.JSONResponse(
+            content={"redirect_to": data.get("redirect_to", "")}
+        )
+    except requests.RequestException as e:
+        logging.getLogger(__name__).warning("Hydra consent accept failed: %s", e)
+        return responses.JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"status": "error", "message": "failed to accept consent request"},
+        )
+
+
+@app.post("/hydra/consent/reject")
+def reject_consent(body: dict):
+    challenge = body.get("challenge")
+    if not challenge:
+        return responses.JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"status": "error", "message": "missing challenge"},
+        )
+    try:
+        resp = requests.put(
+            f"{HYDRA_ADMIN_URL}/admin/oauth2/auth/requests/consent/reject",
+            params={"consent_challenge": challenge},
+            json={
+                "error": "access_denied",
+                "error_description": "The resource owner denied the request",
+            },
+            timeout=10,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return responses.JSONResponse(
+            content={"redirect_to": data.get("redirect_to", "")}
+        )
+    except requests.RequestException as e:
+        logging.getLogger(__name__).warning("Hydra consent reject failed: %s", e)
+        return responses.JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"status": "error", "message": "failed to reject consent request"},
+        )
+
+
+@app.post("/hydra/login/accept")
+def accept_login(body: dict):
+    challenge = body.get("challenge")
+    subject = body.get("subject")
+    if not challenge or not subject:
+        return responses.JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"status": "error", "message": "missing challenge or subject"},
+        )
+    try:
+        resp = requests.put(
+            f"{HYDRA_ADMIN_URL}/admin/oauth2/auth/requests/login/accept",
+            params={"login_challenge": challenge},
+            json={"subject": subject, "remember": True, "remember_for": 3600},
+            timeout=10,
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return responses.JSONResponse(
+            content={"redirect_to": data.get("redirect_to", "")}
+        )
+    except requests.RequestException as e:
+        logging.getLogger(__name__).warning("Hydra login accept failed: %s", e)
+        return responses.JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "status": "error",
+                "message": "An error occurred while accepting the login challenge",
+            },
+        )
 
 
 @app.get("/healthcheck")
