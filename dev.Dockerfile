@@ -1,4 +1,4 @@
-FROM kernai/refinery-parent-images:v2.2.0-mini
+FROM registry.dev.kern.ai/code-kern-ai/refinery-parent-images:parent-image-updates-mini
 
 WORKDIR /app
 
