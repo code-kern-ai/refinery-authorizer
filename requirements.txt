@@ -12,21 +12,21 @@ annotated-types==0.7.0
     # via
     #   -r requirements/mini-requirements.txt
     #   pydantic
-anyio==4.12.1
+anyio==4.13.0
     # via
     #   -r requirements/mini-requirements.txt
     #   starlette
 asgiref==3.11.1
     # via opentelemetry-instrumentation-asgi
-certifi==2026.1.4
+certifi==2026.2.25
     # via
     #   -r requirements/mini-requirements.txt
     #   requests
-charset-normalizer==3.4.4
+charset-normalizer==3.4.7
     # via
     #   -r requirements/mini-requirements.txt
     #   requests
-click==8.3.1
+click==8.3.2
     # via
     #   -r requirements/mini-requirements.txt
     #   uvicorn
@@ -95,12 +95,11 @@ protobuf==6.33.6
     # via
     #   googleapis-common-protos
     #   opentelemetry-proto
-pydantic==2.7.4
+pydantic==2.12.5
     # via
     #   -r requirements/mini-requirements.txt
-    #   -r requirements/requirements.in
     #   fastapi
-pydantic-core==2.18.4
+pydantic-core==2.41.5
     # via
     #   -r requirements/mini-requirements.txt
     #   pydantic
@@ -123,6 +122,11 @@ typing-extensions==4.15.0
     #   pydantic
     #   pydantic-core
     #   starlette
+    #   typing-inspection
+typing-inspection==0.4.2
+    # via
+    #   -r requirements/mini-requirements.txt
+    #   pydantic
 urllib3==2.6.3
     # via
     #   -r requirements/mini-requirements.txt
