@@ -1,4 +1,4 @@
-ARG PARENT_IMAGE=kernai/refinery-parent-images:v2.5.0-mini
+ARG PARENT_IMAGE=kernai/refinery-parent-images:v2.4.0-mini
 
 FROM ${PARENT_IMAGE} AS builder
 
