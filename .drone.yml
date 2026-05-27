@@ -40,7 +40,6 @@ platform:
 steps:
   - name: trigger update
     image: appleboy/drone-ssh
-    failure: ignore
     settings:
       host: app.dev.kern.ai
       username:
@@ -69,7 +68,7 @@ platform:
 
 steps:
   - name: build and publish
-    image: plugins/docker:21.2.8-linux-amd64
+    image: plugins/docker:21.2.8-linux-arm64
     settings:
       registry: registry.dev.kern.ai
       username:
@@ -132,7 +131,7 @@ platform:
 
 steps:
   - name: build and publish
-    image: plugins/docker:21.2.8-linux-amd64
+    image: plugins/docker:21.2.8-linux-arm64
     settings:
       username:
         from_secret: dockerhub_username
