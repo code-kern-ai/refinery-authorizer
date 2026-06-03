@@ -1,15 +1,16 @@
-ARG PARENT_IMAGE=kernai/refinery-parent-images:v2.4.0-mini
+ARG PARENT_IMAGE=registry.dev.kern.ai/code-kern-ai/refinery-parent-images:hardened-images-mini
+ARG DHI_PYTHON_BUILD=dhi.io/python:3.11-debian12-dev
 
-FROM ${PARENT_IMAGE} AS builder
+FROM ${PARENT_IMAGE} AS venv-source
+
+FROM ${DHI_PYTHON_BUILD} AS builder
 
 ENV VENV_PATH=/opt/venv
 ENV PATH="${VENV_PATH}/bin:${PATH}"
 
 WORKDIR /app
 
-USER root
-
-RUN if [ ! -d "${VENV_PATH}" ]; then python -m venv "${VENV_PATH}"; fi
+COPY --from=venv-source ${VENV_PATH} ${VENV_PATH}
 
 COPY requirements.txt .
 
@@ -24,11 +25,9 @@ ENV PATH="${VENV_PATH}/bin:${PATH}"
 
 WORKDIR /app
 
-USER root
-
 COPY --from=builder --chown=65532:65532 ${VENV_PATH} ${VENV_PATH}
 COPY --from=builder --chown=65532:65532 /app /app
 
-USER 65532:65532
+USER nonroot
 
 CMD ["/opt/venv/bin/uvicorn", "--host", "0.0.0.0", "--port", "80", "main:app"]
