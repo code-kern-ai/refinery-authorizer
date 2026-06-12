@@ -34,7 +34,7 @@ fastapi==0.120.1
     # via -r requirements/mini-requirements.txt
 googleapis-common-protos==1.75.0
     # via opentelemetry-exporter-otlp-proto-grpc
-grpcio==1.80.0
+grpcio==1.81.1
     # via opentelemetry-exporter-otlp-proto-grpc
 h11==0.16.0
     # via
@@ -135,5 +135,5 @@ uvicorn==0.35.0
     # via -r requirements/mini-requirements.txt
 wrapt==1.17.3
     # via opentelemetry-instrumentation
-zipp==3.23.1
+zipp==4.1.0
     # via importlib-metadata
