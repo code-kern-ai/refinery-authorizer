@@ -1,5 +1,5 @@
 -r mini-requirements.txt
-opentelemetry-exporter-otlp-proto-grpc==1.37.0
-opentelemetry-instrumentation-fastapi==0.58b0
-opentelemetry-instrumentation-logging==0.58b0
-prometheus-client==0.23.1
+opentelemetry-exporter-otlp-proto-grpc==1.45.0
+opentelemetry-instrumentation-fastapi==0.66b0
+opentelemetry-instrumentation-logging==0.66b0
+prometheus-client==0.26.0
